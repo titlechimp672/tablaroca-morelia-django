@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Subir Imagen - {{ blog.titulo }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'lista_blogs' %}" class="text-decoration-none">
+                <i class="bi bi-house-door me-1"></i>Mis Blogs
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'editar_blog' blog.id %}" class="text-decoration-none">
+                <i class="bi bi-pencil me-1"></i>{{ blog.titulo|truncatechars:30 }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-upload me-1"></i>Subir Imagen
+        </li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        
+        <!-- Información del blog -->
+        <div class="card bg-dark text-light border-secondary shadow-sm mb-4">
+            <div class="card-header border-bottom border-secondary">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Blog: {{ blog.titulo }}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p class="mb-2">{{ blog.descripcion|truncatechars:200 }}</p>
+                        <div class="d-flex gap-3 small text-muted">
+                            <span>
+                                <i class="bi bi-calendar me-1"></i>{{ blog.fecha_creacion|date:"d M Y" }}
+                            </span>
+                            <span>
+                                <i class="bi bi-palette me-1"></i>{{ blog.seccion|capfirst }}
+                            </span>
+                            <span class="{% if blog.publicar %}text-success{% else %}text-warning{% endif %}">
+                                <i class="bi {% if blog.publicar %}bi-eye-fill{% else %}bi-eye-slash{% endif %} me-1"></i>
+                                {% if blog.publicar %}Publicado{% else %}Borrador{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <span class="badge bg-info">
+                            <i class="bi bi-images me-1"></i>{{ blog.imagenes.count }}/1 imágenes
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if mensaje %}
+        <!-- Mensaje de límite alcanzado -->
+        <div class="alert alert-warning border-warning" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h6 class="alert-heading mb-1">Límite de imágenes alcanzado</h6>
+                    <p class="mb-0">{{ mensaje }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones alternativas -->
+        <div class="card bg-secondary text-light">
+            <div class="card-body text-center">
+                <h6 class="card-title">
+                    <i class="bi bi-lightbulb me-2"></i>¿Qué puedes hacer?
+                </h6>
+                <div class="d-flex gap-2 justify-content-center flex-wrap">
+                    <a href="{% url 'eliminar_imagen' blog.imagenes.first.id %}" class="btn btn-outline-danger">
+                        <i class="bi bi-trash me-1"></i>Eliminar imagen actual
+                    </a>
+                    <a href="{% url 'editar_blog' blog.id %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil me-1"></i>Editar blog
+                    </a>
+                    <a href="{% url 'lista_blogs' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Volver a mis blogs
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Formulario de subida -->
+        <div class="card bg-dark text-light border-secondary shadow-sm">
+            <div class="card-header border-bottom border-secondary">
+                <h5 class="mb-0">
+                    <i class="bi bi-cloud-upload me-2"></i>Subir Nueva Imagen
+                </h5>
+            </div>
+            <div class="card-body">
+                
+                <!-- Área de drop zone -->
+                <div class="mb-4">
+                    <div id="dropZone" class="border border-2 border-dashed border-secondary rounded-3 p-5 text-center position-relative" 
+                         style="min-height: 200px; background: rgba(108, 117, 125, 0.1);">
+                        <div id="dropContent">
+                            <i class="bi bi-cloud-upload text-muted mb-3" style="font-size: 3rem;"></i>
+                            <h5 class="text-muted">Arrastra tu imagen aquí</h5>
+                            <p class="text-muted mb-3">o haz clic para seleccionar</p>
+                            <button type="button" class="btn btn-outline-primary" id="selectFileBtn">
+                                <i class="bi bi-folder2-open me-2"></i>Seleccionar Archivo
+                            </button>
+                        </div>
+                        
+                        <!-- Preview de imagen -->
+                        <div id="imagePreview" class="d-none position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                            <div class="text-center">
+                                <img id="previewImg" src="" alt="Preview" class="img-fluid rounded" style="max-height: 180px;">
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-warning" id="changeImageBtn">
+                                        <i class="bi bi-arrow-repeat me-1"></i>Cambiar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información sobre formatos -->
+                <div class="alert alert-info border-info bg-info bg-opacity-10" role="alert">
+                    <div class="d-flex">
+                        <i class="bi bi-info-circle me-2 mt-1"></i>
+                        <div>
+                            <h6 class="alert-heading mb-1">Requisitos de imagen:</h6>
+                            <ul class="mb-0 small">
+                                <li><strong>Formatos:</strong> JPG, PNG, GIF</li>
+                                <li><strong>Tamaño máximo:</strong> 5MB</li>
+                                <li><strong>Recomendado:</strong> Mínimo 800x600 píxeles</li>
+                                <li><strong>Límite:</strong> 1 imagen por blog</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario oculto -->
+                <form method="post" enctype="multipart/form-data" id="uploadForm" class="d-none">
+                    {% csrf_token %}
+                    {{ form.imagen|add_class:"form-control" }}
+                </form>
+
+                <!-- Información del archivo seleccionado -->
+                <div id="fileInfo" class="d-none">
+                    <div class="card bg-secondary">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-file-earmark-image me-2"></i>Archivo seleccionado
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Nombre:</strong> <span id="fileName"></span></p>
+                                    <p class="mb-1"><strong>Tamaño:</strong> <span id="fileSize"></span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Tipo:</strong> <span id="fileType"></span></p>
+                                    <p class="mb-0"><strong>Estado:</strong> <span id="fileStatus" class="badge bg-success">Listo para subir</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'lista_blogs' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Cancelar
+                    </a>
+                    <a href="{% url 'editar_blog' blog.id %}" class="btn btn-outline-warning">
+                        <i class="bi bi-pencil me-1"></i>Editar Blog
+                    </a>
+                    <button type="submit" form="uploadForm" class="btn btn-success" id="uploadBtn" disabled>
+                        <span id="uploadText">
+                            <i class="bi bi-cloud-upload me-1"></i>Subir Imagen
+                        </span>
+                        <span id="uploadSpinner" class="d-none">
+                            <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                            Subiendo...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{% if not mensaje %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.querySelector('#uploadForm input[type="file"]');
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadText = document.getElementById('uploadText');
+    const uploadSpinner = document.getElementById('uploadSpinner');
+    const dropContent = document.getElementById('dropContent');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const changeImageBtn = document.getElementById('changeImageBtn');
+    const fileInfo = document.getElementById('fileInfo');
+
+    // Click en botón seleccionar
+    selectFileBtn.addEventListener('click', () => fileInput.click());
+    changeImageBtn.addEventListener('click', () => fileInput.click());
+
+    // Click en drop zone
+    dropZone.addEventListener('click', (e) => {
+        if (e.target === dropZone || e.target === dropContent) {
+            fileInput.click();
+        }
+    });
+
+    // Drag & Drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight(e) {
+        dropZone.classList.add('border-primary', 'bg-primary', 'bg-opacity-10');
+    }
+
+    function unhighlight(e) {
+        dropZone.classList.remove('border-primary', 'bg-primary', 'bg-opacity-10');
+    }
+
+    dropZone.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect();
+        }
+    }
+
+    // Cambio en input file
+    fileInput.addEventListener('change', handleFileSelect);
+
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        // Validar archivo
+        if (!validateFile(file)) return;
+
+        // Mostrar información del archivo
+        showFileInfo(file);
+
+        // Mostrar preview
+        showImagePreview(file);
+
+        // Habilitar botón de subida
+        uploadBtn.disabled = false;
+    }
+
+    function validateFile(file) {
+        // Validar tipo
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Error: Solo se permiten archivos JPG, PNG y GIF.');
+            return false;
+        }
+
+        // Validar tamaño (5MB)
+        const maxSize = 5 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('Error: La imagen no puede ser mayor a 5MB.');
+            return false;
+        }
+
+        return true;
+    }
+
+    function showFileInfo(file) {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileSize').textContent = formatFileSize(file.size);
+        document.getElementById('fileType').textContent = file.type;
+        fileInfo.classList.remove('d-none');
+    }
+
+    function showImagePreview(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            dropContent.classList.add('d-none');
+            imagePreview.classList.remove('d-none');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Submit form
+    uploadForm.addEventListener('submit', function() {
+        uploadText.classList.add('d-none');
+        uploadSpinner.classList.remove('d-none');
+        uploadBtn.disabled = true;
+    });
+});
+</script>
+{% endif %}
+{% endblock %}

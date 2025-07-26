@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Editar Blog - {{ blog.titulo }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'lista_blogs' %}" class="text-decoration-none">
+                <i class="bi bi-house-door me-1"></i>Mis Blogs
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-pencil me-1"></i>Editar Blog
+        </li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-dark text-light border-secondary shadow-sm">
+            <div class="card-header border-bottom border-secondary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Editar Blog
+                    </h5>
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-secondary">
+                            <i class="bi bi-calendar me-1"></i>{{ blog.fecha_creacion|date:"d M Y" }}
+                        </span>
+                        <span class="badge {% if blog.publicar %}bg-success{% else %}bg-warning{% endif %}">
+                            <i class="bi {% if blog.publicar %}bi-eye-fill{% else %}bi-eye-slash{% endif %} me-1"></i>
+                            {% if blog.publicar %}Publicado{% else %}Borrador{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate id="editBlogForm">
+                    {% csrf_token %}
+                    
+                    <!-- Título -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.titulo.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.titulo.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.titulo|add_class:"form-control" }}
+                            {% if form.titulo.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.titulo.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.titulo.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.descripcion.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.descripcion.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.descripcion|add_class:"form-control" }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.descripcion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.descripcion.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Sección/Diseño -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.seccion.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.seccion.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.seccion|add_class:"form-control" }}
+                            {% if form.seccion.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.seccion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.seccion.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Publicar -->
+                    <div class="mb-4 row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <div class="form-check">
+                                {{ form.publicar|add_class:"form-check-input" }}
+                                <label for="{{ form.publicar.id_for_label }}" class="form-check-label">
+                                    <strong>{{ form.publicar.label }}</strong>
+                                </label>
+                                {% if form.publicar.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle me-1"></i>{{ form.publicar.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.publicar.help_text }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-warning" id="updateBtn">
+                                    <span id="updateText">
+                                        <i class="bi bi-check-lg me-1"></i>Actualizar Blog
+                                    </span>
+                                    <span id="updateSpinner" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                        Actualizando...
+                                    </span>
+                                </button>
+                                <a href="{% url 'lista_blogs' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left me-1"></i>Volver
+                                </a>
+                                <a href="{% url 'vista_publica_cliente' blog.propietario.username blog.seccion %}" 
+                                   target="_blank" class="btn btn-outline-info">
+                                    <i class="bi bi-box-arrow-up-right me-1"></i>Vista Previa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="bi bi-info-circle me-2"></i>Información del Blog
+                        </h6>
+                        <p class="card-text small mb-1">
+                            <strong>Creado:</strong> {{ blog.fecha_creacion|date:"d M Y, H:i" }}
+                        </p>
+                        <p class="card-text small mb-1">
+                            <strong>Imágenes:</strong> {{ blog.imagenes.count }}/1
+                        </p>
+                        <p class="card-text small mb-0">
+                            <strong>Estado:</strong> 
+                            {% if blog.publicar %}
+                                <span class="text-success">Público</span>
+                            {% else %}
+                                <span class="text-warning">Borrador</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-secondary text-light">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="bi bi-tools me-2"></i>Acciones Rápidas
+                        </h6>
+                        {% if blog.imagenes.count == 0 %}
+                            <a href="{% url 'subir_imagen' blog.id %}" class="btn btn-sm btn-outline-info mb-2 w-100">
+                                <i class="bi bi-upload me-1"></i>Subir Imagen
+                            </a>
+                        {% else %}
+                            <a href="{% url 'eliminar_imagen' blog.imagenes.first.id %}" class="btn btn-sm btn-outline-danger mb-2 w-100">
+                                <i class="bi bi-trash me-1"></i>Eliminar Imagen
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'eliminar_blog' blog.id %}" class="btn btn-sm btn-outline-danger w-100">
+                            <i class="bi bi-trash3 me-1"></i>Eliminar Blog
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus en el primer campo
+    const tituloField = document.querySelector('#{{ form.titulo.id_for_label }}');
+    if (tituloField) {
+        tituloField.focus();
+        // Posicionar cursor al final
+        tituloField.setSelectionRange(tituloField.value.length, tituloField.value.length);
+    }
+
+    // Contador de caracteres para el título
+    const maxLength = 255;
+    
+    function updateCounter() {
+        const remaining = maxLength - tituloField.value.length;
+        const helpText = tituloField.closest('.col-sm-9').querySelector('.form-text');
+        helpText.textContent = `${remaining} caracteres restantes`;
+        
+        if (remaining < 20) {
+            helpText.classList.add('text-warning');
+        } else {
+            helpText.classList.remove('text-warning');
+        }
+    }
+    
+    if (tituloField) {
+        tituloField.addEventListener('input', updateCounter);
+        updateCounter(); // Llamada inicial
+    }
+
+    // Loading state en el botón
+    const form = document.getElementById('editBlogForm');
+    const updateBtn = document.getElementById('updateBtn');
+    const updateText = document.getElementById('updateText');
+    const updateSpinner = document.getElementById('updateSpinner');
+
+    if (form) {
+        form.addEventListener('submit', function() {
+            updateText.classList.add('d-none');
+            updateSpinner.classList.remove('d-none');
+            updateBtn.disabled = true;
+        });
+    }
+
+    // Validación en tiempo real
+    const fields = form.querySelectorAll('input, textarea, select');
+    fields.forEach(field => {
+        field.addEventListener('input', function() {
+            const fieldGroup = field.closest('.row');
+            const errorDiv = fieldGroup.querySelector('.text-danger');
+            
+            if (field.value.trim() !== '') {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        });
+    });
+
+    // Detectar cambios no guardados
+    let hasChanges = false;
+    fields.forEach(field => {
+        const originalValue = field.value;
+        field.addEventListener('input', function() {
+            hasChanges = (field.value !== originalValue);
+        });
+    });
+
+    // Advertir sobre cambios no guardados
+    window.addEventListener('beforeunload', function(e) {
+        if (hasChanges) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    // No advertir si se está enviando el formulario
+    form.addEventListener('submit', function() {
+        hasChanges = false;
+    });
+});
+</script>
+{% endblock %}

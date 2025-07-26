@@ -1,0 +1,742 @@
+\documentclass[11pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tcolorbox}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+% Configuración de página
+\geometry{left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm}
+
+% Configuración de colores
+\definecolor{codeblue}{rgb}{0.25,0.5,0.8}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Configuración de código
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codeblue},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=false,
+	numbers=none,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2
+}
+\lstset{style=mystyle}
+
+% Configuración de encabezados y pie de página
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textit{Sistema Blog Admin - Documentación Técnica}}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\textit{Desarrollado con Django 5.1.2}}
+
+% Configuración de hipervínculos
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=cyan,
+	pdftitle={Sistema Blog Admin - Documentación Técnica},
+	pdfpagemode=FullScreen,
+}
+
+% Título del documento
+\title{
+	\vspace{-2cm}
+	\begin{center}
+		\Huge\textbf{Sistema Blog Admin}\\
+		\Large\textit{Documentación Técnica Completa}\\
+		\vspace{1cm}
+		\begin{tcolorbox}[width=0.6\textwidth,colback=blue!10!white,colframe=blue!75!black]
+			\centering
+			\Large\textbf{Django 5.1.2}\\
+			\large Sistema de Gestión de Blogs
+		\end{tcolorbox}
+		\vspace{0.5cm}
+		\normalsize Versión 1.0 - \today
+	\end{center}
+}
+
+\author{
+	\textbf{Desarrollador:} Eduardo Mellado\\
+	\textbf{Tecnologia:} Django 5.1.2 + Bootstrap 5\\
+	\textbf{Base de datos:} SQLite3\\
+	\textbf{Frontend:} HTML5, CSS3, JavaScript
+}
+
+\date{}
+
+\begin{document}
+	
+	\maketitle
+	\thispagestyle{empty}
+	\newpage
+	
+	% Tabla de contenidos
+	\tableofcontents
+	\newpage
+	
+	% Lista de figuras
+	\listoffigures
+	\newpage
+	
+	% Lista de tablas
+	\listoftables
+	\newpage
+	
+	\section{Introducción}
+	
+	\subsection{Descripción del Sistema}
+	El \textbf{Sistema Blog Admin} es una aplicación web desarrollada en Django que permite a los usuarios crear, gestionar y publicar blogs de forma intuitiva. El sistema cuenta con una interfaz administrativa moderna y templates públicos personalizables.
+	
+	\subsection{Características Principales}
+	\begin{itemize}[leftmargin=1.5cm]
+		\item \textbf{Gestión completa de blogs:} CRUD (Crear, Leer, Actualizar, Eliminar)
+		\item \textbf{Sistema de imágenes:} Subida y gestión de imágenes por blog
+		\item \textbf{Múltiples diseños:} Templates públicos intercambiables
+		\item \textbf{Control de publicación:} Estados de borrador y publicado
+		\item \textbf{Autenticación robusta:} Sistema de usuarios integrado
+		\item \textbf{Interfaz moderna:} Bootstrap 5 con modo oscuro
+		\item \textbf{Responsive design:} Optimizado para dispositivos móviles
+	\end{itemize}
+	
+	\subsection{Tecnologías Utilizadas}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{@{}ll@{}}
+			\toprule
+			\textbf{Categoría} & \textbf{Tecnología} \\
+			\midrule
+			Backend & Django 5.1.2 \\
+			Base de datos & SQLite3 \\
+			Frontend & Bootstrap 5.3.3 \\
+			Iconos & Bootstrap Icons 1.11.1 \\
+			Formularios & Django Widget Tweaks \\
+			Lenguaje & Python 3.12+ \\
+			Servidor web & Django Development Server \\
+			\bottomrule
+		\end{tabular}
+		\caption{Stack tecnológico del sistema}
+		\label{tab:tech-stack}
+	\end{table}
+	
+	\section{Arquitectura del Sistema}
+	
+	\subsection{Estructura General}
+	El proyecto sigue el patrón MVT (Model-View-Template) de Django con una arquitectura modular que separa claramente las responsabilidades.
+	
+	\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Estructura del Proyecto]
+		\begin{verbatim}
+			proyecto_blogs/
+			|-- manage.py
+			|-- proyecto_blogs/           # Configuracion principal
+			|   |-- settings.py
+			|   |-- urls.py
+			|   |-- wsgi.py
+			|   +-- asgi.py
+			|-- blogs/                    # App principal
+			|   |-- models.py
+			|   |-- views.py
+			|   |-- forms.py
+			|   |-- urls.py
+			|   |-- admin.py
+			|   +-- templates/
+			|-- usuarios/                 # App de autenticacion
+			|   |-- urls.py
+			|   +-- templates/
+			|-- templates/                # Templates base
+			|-- static/                   # Archivos estaticos
+			|-- media/                    # Archivos subidos
+			+-- db.sqlite3               # Base de datos
+		\end{verbatim}
+	\end{tcolorbox}
+	
+	\subsection{Diagrama de Arquitectura}
+	
+	\begin{figure}[h!]
+		\centering
+		\begin{tcolorbox}[width=0.9\textwidth,colback=gray!10!white,colframe=gray!75!black]
+			\begin{center}
+				\textbf{Usuario} \\
+				(Flecha hacia abajo) \\
+				\textbf{Templates (Frontend)} \\
+				(Flecha hacia abajo) \\
+				\textbf{Views (Controlador)} \\
+				(Flecha hacia abajo) \\
+				\textbf{Models (Datos)} \\
+				(Flecha hacia abajo) \\
+				\textbf{SQLite Database}
+			\end{center}
+		\end{tcolorbox}
+		\caption{Flujo de datos del sistema MVT}
+		\label{fig:architecture}
+	\end{figure}
+	
+	\section{Instalación y Configuración}
+	
+	\subsection{Requisitos del Sistema}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{@{}ll@{}}
+			\toprule
+			\textbf{Componente} & \textbf{Versión Mínima} \\
+			\midrule
+			Python & 3.10+ \\
+			pip & 21.0+ \\
+			Django & 5.1.2 \\
+			django-widget-tweaks & 1.4.12 \\
+			\bottomrule
+		\end{tabular}
+		\caption{Requisitos del sistema}
+		\label{tab:requirements}
+	\end{table}
+	
+	\subsection{Instalación Paso a Paso}
+	
+	\begin{enumerate}
+		\item \textbf{Clonar o descargar el proyecto}
+		\begin{lstlisting}[language=bash]
+			git clone <repositorio>
+			cd proyecto_blogs
+		\end{lstlisting}
+		
+		\item \textbf{Crear entorno virtual}
+		\begin{lstlisting}[language=bash]
+			python -m venv venv
+			# Windows
+			venv\Scripts\activate
+			# Linux/Mac
+			source venv/bin/activate
+		\end{lstlisting}
+		
+		\item \textbf{Instalar dependencias}
+		\begin{lstlisting}[language=bash]
+			pip install django==5.1.2
+			pip install django-widget-tweaks
+		\end{lstlisting}
+		
+		\item \textbf{Configurar base de datos}
+		\begin{lstlisting}[language=bash]
+			python manage.py makemigrations
+			python manage.py migrate
+		\end{lstlisting}
+		
+		\item \textbf{Crear superusuario}
+		\begin{lstlisting}[language=bash]
+			python manage.py createsuperuser
+		\end{lstlisting}
+		
+		\item \textbf{Ejecutar servidor de desarrollo}
+		\begin{lstlisting}[language=bash]
+			python manage.py runserver
+		\end{lstlisting}
+		
+		\item \textbf{Acceder al sistema}
+		\begin{itemize}
+			\item Admin: \url{http://127.0.0.1:8000/blogs/}
+			\item Login: \url{http://127.0.0.1:8000/usuarios/login/}
+			\item Django Admin: \url{http://127.0.0.1:8000/admin/}
+		\end{itemize}
+	\end{enumerate}
+	
+	\chapter{\texttt{models.py}}
+	
+	\section{Introducción}
+	
+	El archivo \texttt{models.py} es uno de los componentes fundamentales en cualquier aplicación Django. Define los modelos de datos que representan las tablas en la base de datos. En este documento, analizaremos línea por línea el archivo \texttt{models.py} de la aplicación de blogs, explicando el propósito y funcionamiento de cada elemento.
+	
+	\section{Importaciones}
+	
+	\begin{lstlisting}[language=Python]
+		from django.db import models
+	\end{lstlisting}
+	
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el módulo \texttt{models} de Django, que contiene todas las clases base necesarias para crear modelos de base de datos.
+		\item \textbf{Funcionalidad}: Proporciona acceso a:
+		\begin{itemize}
+			\item La clase base \texttt{Model} de la que heredan todos los modelos
+			\item Tipos de campos como \texttt{CharField}, \texttt{TextField}, \texttt{DateTimeField}, etc.
+			\item Opciones de relaciones como \texttt{ForeignKey}, \texttt{ManyToManyField}, etc.
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		from django.contrib.auth.models import User
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el modelo \texttt{User} predefinido de Django.
+		\item \textbf{Funcionalidad}: 
+		\begin{itemize}
+			\item Permite utilizar el sistema de autenticación integrado de Django
+			\item El modelo \texttt{User} incluye campos como username, password, email, first\_name, last\_name, etc.
+			\item Se utiliza para asociar blogs con usuarios específicos del sistema
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		import os
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el módulo \texttt{os} de Python estándar.
+		\item \textbf{Funcionalidad}: 
+		\begin{itemize}
+			\item Proporciona funciones para interactuar con el sistema operativo
+			\item En este contexto, se usa específicamente \texttt{os.path.join()} para construir rutas de archivos de manera segura y portable
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Función de Renombrado de Imágenes}
+	
+	\begin{lstlisting}[language=Python]
+	def renombrar_imagen(instance, filename):
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Define una función personalizada para renombrar archivos de imagen al subirlos.
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{instance}: La instancia del modelo \texttt{Imagen} que se está guardando
+			\item \texttt{filename}: El nombre original del archivo subido
+		\end{itemize}
+		\item \textbf{Uso}: Esta función se pasa como argumento al parámetro \texttt{upload\_to} del campo \texttt{ImageField}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		blog_id = instance.blog.id or 'temp'
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Obtiene el ID del blog asociado o asigna 'temp' si no existe.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{instance.blog} accede a la relación ForeignKey hacia el modelo Blog
+			\item \texttt{.id} obtiene el identificador único del blog
+			\item El operador \texttt{or} proporciona un valor por defecto si el blog aún no tiene ID (caso de creación simultánea)
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		# Contar cuantas imagenes ya existen del blog
+		total = Imagen.objects.filter(blog=instance.blog).count() + 1
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Calcula el número secuencial para la nueva imagen.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{Imagen.objects} accede al manager del modelo Imagen
+			\item \texttt{.filter(blog=instance.blog)} filtra solo las imágenes del blog actual
+			\item \texttt{.count()} cuenta cuántas imágenes existen
+			\item Se suma 1 para obtener el número de la nueva imagen
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		extension = filename.split('.')[-1]
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Extrae la extensión del archivo original.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{split('.')} divide el nombre del archivo por puntos
+			\item \texttt{[-1]} obtiene el último elemento (la extensión)
+			\item Ejemplo: "imagen.jpg" → ["imagen", "jpg"] → "jpg"
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		nuevo_nombre = f"blog{blog_id}_{total:03d}.{extension}"
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Construye el nuevo nombre del archivo usando f-strings.
+		\item \textbf{Formato resultante}: blog[ID]\_[NUMERO].extension
+		\item \textbf{Detalles}:
+		\begin{itemize}
+			\item El formato \{total:03d\} formatea el número con 3 dígitos, rellenando con ceros
+			\item Ejemplos: blog5\_001.png, blog5\_002.jpg, blog5\_003.gif
+		\end{itemize}
+	\end{itemize}
+	
+	\begin{lstlisting}[language=Python]
+		return os.path.join('imagenes_blogs', nuevo_nombre)
+	\end{lstlisting}
+	\begin{itemize}
+		\item \textbf{Propósito}: Retorna la ruta completa donde se guardará el archivo.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{os.path.join()} construye rutas de manera segura según el sistema operativo
+			\item La imagen se guardará en: MEDIA\_ROOT/imagenes\_blogs/blog[ID]\_[NUMERO].extension
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Modelo Blog}
+	El modelo principal que almacena la información de cada blog.
+	
+	\begin{lstlisting}[language=python]
+	class Blog(models.Model):
+		propietario = models.ForeignKey(User, on_delete=models.CASCADE)
+		titulo = models.CharField(max_length=255)
+		descripcion = models.TextField(blank=True)
+		fecha_creacion = models.DateTimeField(auto_now_add=True)
+		publicar = models.BooleanField(default=False)
+		seccion = models.CharField(max_length=100, default='blog1')
+		
+	def __str__(self):
+		return self.titulo
+	\end{lstlisting}
+	
+	\subsection{Modelo Imagen}
+	Gestiona las imágenes asociadas a cada blog con renombrado automático.
+	
+	\begin{lstlisting}[language=python]
+	def renombrar_imagen(instance, filename):
+		blog_id = instance.blog.id or 'temp'
+		total = Imagen.objects.filter(blog=instance.blog).count() + 1
+		extension = filename.split('.')[-1]
+		nuevo_nombre = f"blog{blog_id}_{total:03d}.{extension}"
+		return os.path.join('imagenes_blogs', nuevo_nombre)
+		
+	class Imagen(models.Model):
+		blog = models.ForeignKey(Blog, on_delete=models.CASCADE, 
+		related_name='imagenes')
+		imagen = models.ImageField(upload_to=renombrar_imagen)
+		
+		def __str__(self):
+			return f"Imagen de {self.blog.titulo}"
+	\end{lstlisting}
+	
+	\subsection{Relaciones de Base de Datos}
+	
+	\begin{figure}[h!]
+		\centering
+		\begin{tcolorbox}[width=0.8\textwidth,colback=green!5!white,colframe=green!75!black]
+			\begin{center}
+				\textbf{User} (Django Auth) \\
+				(Relacion 1:N) \\
+				\textbf{Blog} \\
+				(Relacion 1:N) \\
+				\textbf{Imagen}
+			\end{center}
+		\end{tcolorbox}
+		\caption{Diagrama de relaciones de la base de datos}
+		\label{fig:database}
+	\end{figure}
+	
+	\section{Sistema de Vistas}
+	
+	\subsection{Vistas Principales}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{@{}lll@{}}
+			\toprule
+			\textbf{Vista} & \textbf{URL} & \textbf{Función} \\
+			\midrule
+			\texttt{lista\_blogs} & \texttt{/blogs/} & Dashboard principal \\
+			\texttt{crear\_blog} & \texttt{/blogs/crear/} & Formulario de creación \\
+			\texttt{editar\_blog} & \texttt{/blogs/editar/<id>/} & Edición de blog \\
+			\texttt{eliminar\_blog} & \texttt{/blogs/eliminar/<id>/} & Confirmación de eliminación \\
+			\texttt{subir\_imagen} & \texttt{/blogs/subir-imagen/<id>/} & Upload de imágenes \\
+			\texttt{vista\_cliente\_publica} & \texttt{/blogs/<user>/<seccion>/} & Vista pública \\
+			\bottomrule
+		\end{tabular}
+		\caption{Mapeo de vistas principales}
+		\label{tab:views}
+	\end{table}
+	
+	\subsection{Decoradores de Seguridad}
+	Todas las vistas administrativas utilizan el decorador \texttt{@login\_required} para garantizar que solo usuarios autenticados puedan acceder.
+	
+	\begin{lstlisting}[language=python]
+		@login_required
+		def lista_blogs(request):
+		blogs = Blog.objects.filter(propietario=request.user)
+		return render(request, 'blogs/lista_blogs.html', {
+			'blogs': blogs
+		})
+	\end{lstlisting}
+	
+	\section{Sistema de Templates}
+	
+	\subsection{Jerarquía de Templates}
+	El sistema utiliza herencia de templates para mantener consistencia visual.
+	
+	\begin{tcolorbox}[colback=yellow!5!white,colframe=yellow!75!black,title=Estructura de Templates]
+		\begin{verbatim}
+			templates/
+			|-- base.html                 # Template base
+			|-- alejandro_blog1.html      # Diseno empresarial
+			|-- alejandro_blog2.html      # Diseno personal
+			+-- blogs/
+			|-- lista_blogs.html
+			|-- crear_blog.html
+			|-- editar_blog.html
+			|-- eliminar_blog.html
+			|-- subir_imagen.html
+			+-- eliminar_imagen.html
+		\end{verbatim}
+	\end{tcolorbox}
+	
+	\subsection{Features del Frontend}
+	\begin{itemize}
+		\item \textbf{Bootstrap 5:} Framework CSS moderno
+		\item \textbf{Modo oscuro:} \texttt{data-bs-theme="dark"}
+		\item \textbf{Bootstrap Icons:} Iconografía consistente
+		\item \textbf{Responsive design:} Adaptable a móviles
+		\item \textbf{Validación en tiempo real:} JavaScript integrado
+		\item \textbf{Loading states:} Feedback visual en formularios
+	\end{itemize}
+	
+	\section{Configuración Avanzada}
+	
+	\subsection{Variables de Configuración}
+	
+	\begin{lstlisting}[language=python]
+		# Configuracion de archivos media
+		MEDIA_URL = '/media/'
+		MEDIA_ROOT = BASE_DIR / 'media'
+		
+		# Configuracion de autenticacion
+		LOGIN_URL = '/usuarios/login/'
+		LOGIN_REDIRECT_URL = '/blogs/'
+		LOGOUT_REDIRECT_URL = '/usuarios/login/'
+		
+		# Localizacion
+		LANGUAGE_CODE = 'es-mx'
+		TIME_ZONE = 'America/Mexico_City'
+		USE_I18N = True
+		USE_L10N = True
+		USE_TZ = True
+	\end{lstlisting}
+	
+	\subsection{Configuración para Producción}
+	
+	\begin{lstlisting}[language=python]
+		# Para produccion, cambiar:
+		DEBUG = False
+		ALLOWED_HOSTS = ['tu-dominio.com', 'www.tu-dominio.com']
+		
+		# Configurar base de datos PostgreSQL
+		DATABASES = {
+			'default': {
+				'ENGINE': 'django.db.backends.postgresql',
+				'NAME': 'blog_db',
+				'USER': 'blog_user',
+				'PASSWORD': 'password',
+				'HOST': 'localhost',
+				'PORT': '5432',
+			}
+		}
+		
+		# Configurar archivos estaticos
+		STATIC_ROOT = '/var/www/static/'
+		STATICFILES_DIRS = [BASE_DIR / 'static']
+	\end{lstlisting}
+	
+	\section{Despliegue a Producción}
+	
+	\subsection{Preparación del Servidor}
+	
+	\begin{enumerate}
+		\item \textbf{Instalar dependencias del sistema}
+		\begin{lstlisting}[language=bash]
+			sudo apt install python3 python3-pip python3-venv
+			sudo apt install postgresql postgresql-contrib
+			sudo apt install nginx
+		\end{lstlisting}
+		
+		\item \textbf{Configurar PostgreSQL}
+		\begin{lstlisting}[language=bash]
+			sudo -u postgres psql
+			CREATE DATABASE blog_db;
+			CREATE USER blog_user WITH PASSWORD 'password';
+			GRANT ALL PRIVILEGES ON DATABASE blog_db TO blog_user;
+			\quit
+		\end{lstlisting}
+		
+		\item \textbf{Configurar Nginx}
+		\begin{lstlisting}[language=bash]
+			# Archivo: /etc/nginx/sites-available/blog_admin
+			server {
+				listen 80;
+				server_name tu-dominio.com;
+				
+				location / {
+					proxy_pass http://127.0.0.1:8000;
+					proxy_set_header Host $host;
+					proxy_set_header X-Real-IP $remote_addr;
+				}
+				
+				location /static/ {
+					alias /var/www/static/;
+				}
+				
+				location /media/ {
+					alias /var/www/media/;
+				}
+			}
+		\end{lstlisting}
+	\end{enumerate}
+	
+	\subsection{Comandos de Despliegue}
+	
+	\begin{lstlisting}[language=bash]
+		# Recopilar archivos estaticos
+		python manage.py collectstatic --noinput
+		
+		# Aplicar migraciones
+		python manage.py migrate
+		
+		# Ejecutar con Gunicorn
+		pip install gunicorn
+		gunicorn proyecto_blogs.wsgi:application --bind 127.0.0.1:8000
+	\end{lstlisting}
+	
+	\section{Mantenimiento y Extensiones}
+	
+	\subsection{Backup de Base de Datos}
+	
+	\begin{lstlisting}[language=bash]
+		# Backup
+		python manage.py dumpdata > backup.json
+		
+		# Restaurar
+		python manage.py loaddata backup.json
+	\end{lstlisting}
+	
+	\subsection{Extensiones Futuras}
+	\begin{itemize}
+		\item \textbf{Sistema de comentarios:} Interaccion con lectores
+		\item \textbf{SEO avanzado:} Meta tags dinamicos
+		\item \textbf{Analytics:} Estadisticas de visitas
+		\item \textbf{API REST:} Para aplicaciones moviles
+		\item \textbf{Multiidioma:} Soporte internacional
+	\end{itemize}
+	
+	\section{Solución de Problemas}
+	
+	\subsection{Problemas Comunes}
+	
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{@{}p{6cm}p{8cm}@{}}
+			\toprule
+			\textbf{Problema} & \textbf{Solucion} \\
+			\midrule
+			Error 404 en login & Verificar \texttt{LOGIN\_URL} en settings.py \\
+			Imagenes no se muestran & Configurar \texttt{MEDIA\_URL} y \texttt{MEDIA\_ROOT} \\
+			Error de permisos & Verificar decorador \texttt{@login\_required} \\
+			CSS no carga & Ejecutar \texttt{collectstatic} \\
+			\bottomrule
+		\end{tabular}
+		\caption{Problemas comunes y soluciones}
+		\label{tab:troubleshooting}
+	\end{table}
+	
+	\section{Conclusion}
+	
+	El Sistema Blog Admin representa una solucion completa y profesional para la gestion de contenido web. Su arquitectura modular, interfaz intuitiva y codigo limpio lo convierten en una base solida para proyectos de blogging empresarial o personal.
+	
+	La documentacion tecnica aqui presentada proporciona toda la informacion necesaria para instalar, configurar, mantener y extender el sistema segun las necesidades especificas del proyecto.
+	
+	\appendix
+	
+	\section{Codigo de Configuracion Completo}
+	
+	\subsection{settings.py}
+	\begin{lstlisting}[language=python]
+		from pathlib import Path
+		from django.utils.timezone import now
+		
+		BASE_DIR = Path(__file__).resolve().parent.parent
+		
+		SECRET_KEY = 'tu-clave-secreta-aqui'
+		DEBUG = True
+		ALLOWED_HOSTS = []
+		
+		INSTALLED_APPS = [
+		'django.contrib.admin',
+		'django.contrib.auth',
+		'django.contrib.contenttypes',
+		'django.contrib.sessions',
+		'django.contrib.messages',
+		'django.contrib.staticfiles',
+		'widget_tweaks',
+		'blogs',
+		'usuarios',
+		]
+		
+		MIDDLEWARE = [
+		'django.middleware.security.SecurityMiddleware',
+		'django.contrib.sessions.middleware.SessionMiddleware',
+		'django.middleware.common.CommonMiddleware',
+		'django.middleware.csrf.CsrfViewMiddleware',
+		'django.contrib.auth.middleware.AuthenticationMiddleware',
+		'django.contrib.messages.middleware.MessageMiddleware',
+		'django.middleware.clickjacking.XFrameOptionsMiddleware',
+		]
+		
+		ROOT_URLCONF = 'proyecto_blogs.urls'
+		
+		DATABASES = {
+			'default': {
+				'ENGINE': 'django.db.backends.sqlite3',
+				'NAME': BASE_DIR / 'db.sqlite3',
+			}
+		}
+		
+		LANGUAGE_CODE = 'es-mx'
+		TIME_ZONE = 'America/Mexico_City'
+		USE_I18N = True
+		USE_L10N = True
+		USE_TZ = True
+		
+		STATIC_URL = '/static/'
+		STATICFILES_DIRS = [BASE_DIR / 'static']
+		MEDIA_URL = '/media/'
+		MEDIA_ROOT = BASE_DIR / 'media'
+		
+		LOGIN_URL = '/usuarios/login/'
+		LOGIN_REDIRECT_URL = '/blogs/'
+		LOGOUT_REDIRECT_URL = '/usuarios/login/'
+	\end{lstlisting}
+	
+	\section{URLs Principal}
+	\begin{lstlisting}[language=python]
+		from django.contrib import admin
+		from django.urls import path, include
+		from django.conf import settings
+		from django.conf.urls.static import static
+		
+		urlpatterns = [
+		path('admin/', admin.site.urls),
+		path('usuarios/', include('usuarios.urls')),
+		path('blogs/', include('blogs.urls')),  
+		]
+		
+		if settings.DEBUG:
+		urlpatterns += static(settings.MEDIA_URL, 
+		document_root=settings.MEDIA_ROOT)
+	\end{lstlisting}
+	
+\end{document}

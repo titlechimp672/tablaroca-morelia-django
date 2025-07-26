@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Crear Nuevo Blog{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card bg-dark text-light border-secondary shadow-sm">
+            <div class="card-header border-bottom border-secondary">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-plus-circle me-2"></i>Crear nuevo blog
+                    </h5>
+                    <small class="text-muted">Paso 1 de 2</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate id="blogForm">
+                    {% csrf_token %}
+                    
+                    <!-- Título -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.titulo.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.titulo.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.titulo|add_class:"form-control" }}
+                            {% if form.titulo.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.titulo.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.titulo.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.descripcion.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.descripcion.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.descripcion|add_class:"form-control" }}
+                            {% if form.descripcion.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.descripcion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.descripcion.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Sección/Diseño -->
+                    <div class="mb-3 row">
+                        <label for="{{ form.seccion.id_for_label }}" class="col-sm-3 col-form-label">
+                            <strong>{{ form.seccion.label }} *</strong>
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.seccion|add_class:"form-control" }}
+                            {% if form.seccion.errors %}
+                                <div class="text-danger small mt-1">
+                                    <i class="bi bi-exclamation-circle me-1"></i>{{ form.seccion.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">{{ form.seccion.help_text }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Publicar -->
+                    <div class="mb-4 row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <div class="form-check">
+                                {{ form.publicar|add_class:"form-check-input" }}
+                                <label for="{{ form.publicar.id_for_label }}" class="form-check-label">
+                                    <strong>{{ form.publicar.label }}</strong>
+                                </label>
+                                {% if form.publicar.errors %}
+                                    <div class="text-danger small mt-1">
+                                        <i class="bi bi-exclamation-circle me-1"></i>{{ form.publicar.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.publicar.help_text }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-9">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success" id="submitBtn">
+                                    <span id="submitText">
+                                        <i class="bi bi-check-lg me-1"></i>Crear Blog
+                                    </span>
+                                    <span id="submitSpinner" class="d-none">
+                                        <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                        Creando...
+                                    </span>
+                                </button>
+                                <a href="{% url 'lista_blogs' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-x-lg me-1"></i>Cancelar
+                                </a>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                Después de crear el blog podrás agregar imágenes
+                            </small>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview cards -->
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <h6 class="text-white mb-3">Vista previa de diseños:</h6>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card bg-secondary text-light mb-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-building text-primary mb-2" style="font-size: 2rem;"></i>
+                        <h6>Diseño Empresarial</h6>
+                        <small>Ideal para negocios y empresas</small>
+                        <br>
+                        <a href="{% url 'vista_publica_cliente' user.username 'blog1' %}" 
+                           target="_blank" class="btn btn-sm btn-outline-light mt-2">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card bg-secondary text-light mb-3">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-heart text-info mb-2" style="font-size: 2rem;"></i>
+                        <h6>Diseño Personal</h6>
+                        <small>Perfecto para blogs personales</small>
+                        <br>
+                        <a href="{% url 'vista_publica_cliente' user.username 'blog2' %}" 
+                           target="_blank" class="btn btn-sm btn-outline-light mt-2">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus en el primer campo
+    const tituloField = document.querySelector('#{{ form.titulo.id_for_label }}');
+    if (tituloField) {
+        tituloField.focus();
+    }
+
+    // Contador de caracteres para el título
+    const maxLength = 255;
+    
+    function updateCounter() {
+        const remaining = maxLength - tituloField.value.length;
+        const helpText = tituloField.closest('.col-sm-9').querySelector('.form-text');
+        helpText.textContent = `${remaining} caracteres restantes`;
+        
+        if (remaining < 20) {
+            helpText.classList.add('text-warning');
+        } else {
+            helpText.classList.remove('text-warning');
+        }
+    }
+    
+    if (tituloField) {
+        tituloField.addEventListener('input', updateCounter);
+        updateCounter(); // Llamada inicial
+    }
+
+    // Loading state en el botón
+    const form = document.getElementById('blogForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitText = document.getElementById('submitText');
+    const submitSpinner = document.getElementById('submitSpinner');
+
+    if (form) {
+        form.addEventListener('submit', function() {
+            submitText.classList.add('d-none');
+            submitSpinner.classList.remove('d-none');
+            submitBtn.disabled = true;
+        });
+    }
+
+    // Validación en tiempo real
+    const fields = form.querySelectorAll('input, textarea, select');
+    fields.forEach(field => {
+        field.addEventListener('input', function() {
+            const fieldGroup = field.closest('.row');
+            const errorDiv = fieldGroup.querySelector('.text-danger');
+            
+            if (field.value.trim() !== '') {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

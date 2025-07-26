@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Blog - {{ blog.titulo }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'lista_blogs' %}" class="text-decoration-none">
+                <i class="bi bi-house-door me-1"></i>Mis Blogs
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-trash me-1"></i>Eliminar Blog
+        </li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <!-- Alerta de advertencia -->
+        <div class="alert alert-danger border-danger" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-3" style="font-size: 2rem;"></i>
+                <div>
+                    <h5 class="alert-heading mb-1">¡Acción Irreversible!</h5>
+                    <p class="mb-0">Esta acción no se puede deshacer. El blog y todas sus imágenes serán eliminados permanentemente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card principal -->
+        <div class="card bg-dark text-light border-danger shadow-sm">
+            <div class="card-header border-bottom border-danger bg-danger bg-opacity-10">
+                <h5 class="mb-0 text-danger">
+                    <i class="bi bi-trash3 me-2"></i>Confirmar Eliminación
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Información del blog -->
+                <div class="mb-4">
+                    <h6 class="text-light">Blog a eliminar:</h6>
+                    <div class="bg-secondary bg-opacity-50 rounded p-3 border border-secondary">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="text-warning mb-2">{{ blog.titulo }}</h5>
+                                <p class="text-muted mb-2">{{ blog.descripcion|truncatechars:150 }}</p>
+                                <div class="d-flex gap-3 small">
+                                    <span>
+                                        <i class="bi bi-calendar me-1"></i>{{ blog.fecha_creacion|date:"d M Y" }}
+                                    </span>
+                                    <span>
+                                        <i class="bi bi-palette me-1"></i>{{ blog.get_seccion_display|default:blog.seccion }}
+                                    </span>
+                                    <span class="{% if blog.publicar %}text-success{% else %}text-warning{% endif %}">
+                                        <i class="bi {% if blog.publicar %}bi-eye-fill{% else %}bi-eye-slash{% endif %} me-1"></i>
+                                        {% if blog.publicar %}Publicado{% else %}Borrador{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                {% if blog.imagenes.first %}
+                                    <img src="{{ blog.imagenes.first.imagen.url }}" 
+                                         alt="Imagen del blog" 
+                                         class="img-thumbnail"
+                                         style="max-width: 80px; max-height: 80px;">
+                                {% else %}
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="bi bi-image text-muted"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información sobre qué se eliminará -->
+                <div class="mb-4">
+                    <h6 class="text-light">Se eliminarán:</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-1">
+                            <i class="bi bi-check text-danger me-2"></i>
+                            El blog completo (título y contenido)
+                        </li>
+                        <li class="mb-1">
+                            <i class="bi bi-check text-danger me-2"></i>
+                            {{ blog.imagenes.count }} imagen(es) asociada(s)
+                        </li>
+                        <li class="mb-1">
+                            <i class="bi bi-check text-danger me-2"></i>
+                            Toda la configuración de publicación
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Confirmación -->
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDelete">
+                        <label class="form-check-label" for="confirmDelete">
+                            <strong>Confirmo que quiero eliminar este blog permanentemente</strong>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <form method="post" id="deleteForm">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'lista_blogs' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancelar
+                        </a>
+                        <a href="{% url 'editar_blog' blog.id %}" class="btn btn-outline-warning">
+                            <i class="bi bi-pencil me-1"></i>Editar en su lugar
+                        </a>
+                        <button type="submit" class="btn btn-danger" id="deleteBtn" disabled>
+                            <span id="deleteText">
+                                <i class="bi bi-trash3 me-1"></i>Eliminar Definitivamente
+                            </span>
+                            <span id="deleteSpinner" class="d-none">
+                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                Eliminando...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Alternativas -->
+        <div class="mt-4">
+            <div class="card bg-secondary text-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-lightbulb me-2"></i>¿Buscas una alternativa?
+                    </h6>
+                    <p class="card-text small mb-3">
+                        En lugar de eliminar, considera estas opciones:
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if blog.publicar %}
+                            <a href="{% url 'alternar_publicar' blog.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-eye-slash me-1"></i>Despublicar
+                            </a>
+                        {% else %}
+                            <a href="{% url 'alternar_publicar' blog.id %}" class="btn btn-sm btn-outline-success">
+                                <i class="bi bi-eye me-1"></i>Publicar
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'editar_blog' blog.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-pencil me-1"></i>Editar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmCheckbox = document.getElementById('confirmDelete');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteText = document.getElementById('deleteText');
+    const deleteSpinner = document.getElementById('deleteSpinner');
+
+    // Habilitar/deshabilitar botón según checkbox
+    confirmCheckbox.addEventListener('change', function() {
+        deleteBtn.disabled = !this.checked;
+        if (this.checked) {
+            deleteBtn.classList.remove('btn-secondary');
+            deleteBtn.classList.add('btn-danger');
+        } else {
+            deleteBtn.classList.remove('btn-danger');
+            deleteBtn.classList.add('btn-secondary');
+        }
+    });
+
+    // Confirmación adicional antes de enviar
+    deleteForm.addEventListener('submit', function(e) {
+        if (!confirm('¿Estás absolutamente seguro de que quieres eliminar este blog? Esta acción no se puede deshacer.')) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Loading state
+        deleteText.classList.add('d-none');
+        deleteSpinner.classList.remove('d-none');
+        deleteBtn.disabled = true;
+    });
+
+    // Prevenir cierre accidental
+    window.addEventListener('beforeunload', function(e) {
+        if (confirmCheckbox.checked) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+
+    // Efecto visual en el checkbox
+    confirmCheckbox.addEventListener('change', function() {
+        const cardHeader = document.querySelector('.card-header');
+        if (this.checked) {
+            cardHeader.classList.add('animate__animated', 'animate__pulse');
+            setTimeout(() => {
+                cardHeader.classList.remove('animate__animated', 'animate__pulse');
+            }, 1000);
+        }
+    });
+});
+</script>
+{% endblock %}

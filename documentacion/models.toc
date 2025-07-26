@@ -1,0 +1,31 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introducción}{3}{}%
+\contentsline {section}{\numberline {2}Importaciones}{3}{}%
+\contentsline {subsection}{\numberline {2.1}Línea 1: \texttt {from django.db import models}}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Línea 2: \texttt {from django.contrib.auth.models import User}}{3}{}%
+\contentsline {subsection}{\numberline {2.3}Línea 3: \texttt {import os}}{3}{}%
+\contentsline {section}{\numberline {3}Función de Renombrado de Imágenes}{4}{}%
+\contentsline {subsection}{\numberline {3.1}Línea 4: \texttt {def renombrar\_imagen(instance, filename):}}{4}{}%
+\contentsline {subsection}{\numberline {3.2}Línea 5: \texttt {blog\_id = instance.blog.id or 'temp'}}{4}{}%
+\contentsline {subsection}{\numberline {3.3}Línea 7: \texttt {total = Imagen.objects.filter(blog=instance.blog).count() + 1}}{4}{}%
+\contentsline {subsection}{\numberline {3.4}Línea 8: \texttt {extension = filename.split('.')[-1]}}{5}{}%
+\contentsline {subsection}{\numberline {3.5}Línea 9: \texttt {nuevo\_nombre = f"blog\{blog\_id\}\_\{total:03d\}.\{extension\}"}}{5}{}%
+\contentsline {subsection}{\numberline {3.6}Línea 10: \texttt {return os.path.join('imagenes\_blogs', nuevo\_nombre)}}{5}{}%
+\contentsline {section}{\numberline {4}Modelo Blog}{5}{}%
+\contentsline {subsection}{\numberline {4.1}Línea 11: \texttt {class Blog(models.Model):}}{6}{}%
+\contentsline {subsection}{\numberline {4.2}Línea 12: \texttt {propietario = models.ForeignKey(User, on\_delete=models.CASCADE)}}{6}{}%
+\contentsline {subsection}{\numberline {4.3}Línea 13: \texttt {titulo = models.CharField(max\_length=255)}}{6}{}%
+\contentsline {subsection}{\numberline {4.4}Línea 14: \texttt {descripcion = models.TextField(blank=True)}}{6}{}%
+\contentsline {subsection}{\numberline {4.5}Línea 15: \texttt {fecha\_creacion = models.DateTimeField(auto\_now\_add=True)}}{7}{}%
+\contentsline {subsection}{\numberline {4.6}Línea 16: \texttt {publicar = models.BooleanField(default=False)}}{7}{}%
+\contentsline {subsection}{\numberline {4.7}Línea 17: \texttt {seccion = models.CharField(max\_length=100, default='blog1')}}{7}{}%
+\contentsline {subsection}{\numberline {4.8}Líneas 19-20: Método \texttt {\_\_str\_\_}}{7}{}%
+\contentsline {section}{\numberline {5}Modelo Imagen}{8}{}%
+\contentsline {subsection}{\numberline {5.1}Línea 21: \texttt {class Imagen(models.Model):}}{8}{}%
+\contentsline {subsection}{\numberline {5.2}Línea 22: \texttt {blog = models.ForeignKey(Blog, on\_delete=models.CASCADE, related\_name='imagenes')}}{8}{}%
+\contentsline {subsection}{\numberline {5.3}Línea 23: \texttt {imagen = models.ImageField(upload\_to=renombrar\_imagen)}}{8}{}%
+\contentsline {subsection}{\numberline {5.4}Líneas 25-26: Método \texttt {\_\_str\_\_}}{8}{}%
+\contentsline {section}{\numberline {6}Resumen de Funcionalidades}{9}{}%
+\contentsline {subsection}{\numberline {6.1}Características del Sistema}{9}{}%
+\contentsline {subsection}{\numberline {6.2}Ventajas del Diseño}{9}{}%
+\contentsline {section}{\numberline {7}Conclusión}{9}{}%

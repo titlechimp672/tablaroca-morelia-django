@@ -1,0 +1,39 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {0.1}Introducción}{4}{section.0.1}%
+\contentsline {subsection}{\numberline {0.1.1}Descripción del Sistema}{4}{subsection.0.1.1}%
+\contentsline {subsection}{\numberline {0.1.2}Características Principales}{4}{subsection.0.1.2}%
+\contentsline {subsection}{\numberline {0.1.3}Tecnologías Utilizadas}{4}{subsection.0.1.3}%
+\contentsline {section}{\numberline {0.2}Arquitectura del Sistema}{4}{section.0.2}%
+\contentsline {subsection}{\numberline {0.2.1}Estructura General}{4}{subsection.0.2.1}%
+\contentsline {subsection}{\numberline {0.2.2}Diagrama de Arquitectura}{5}{subsection.0.2.2}%
+\contentsline {section}{\numberline {0.3}Instalación y Configuración}{5}{section.0.3}%
+\contentsline {subsection}{\numberline {0.3.1}Requisitos del Sistema}{5}{subsection.0.3.1}%
+\contentsline {subsection}{\numberline {0.3.2}Instalación Paso a Paso}{5}{subsection.0.3.2}%
+\contentsline {chapter}{\numberline {1}\texttt {models.py}}{7}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introducción}{7}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Importaciones}{7}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Función de Renombrado de Imágenes}{8}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Modelo Blog}{9}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Modelo Imagen}{9}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Relaciones de Base de Datos}{9}{subsection.1.3.3}%
+\contentsline {section}{\numberline {1.4}Sistema de Vistas}{9}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Vistas Principales}{9}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Decoradores de Seguridad}{9}{subsection.1.4.2}%
+\contentsline {section}{\numberline {1.5}Sistema de Templates}{10}{section.1.5}%
+\contentsline {subsection}{\numberline {1.5.1}Jerarquía de Templates}{10}{subsection.1.5.1}%
+\contentsline {subsection}{\numberline {1.5.2}Features del Frontend}{10}{subsection.1.5.2}%
+\contentsline {section}{\numberline {1.6}Configuración Avanzada}{11}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Variables de Configuración}{11}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Configuración para Producción}{11}{subsection.1.6.2}%
+\contentsline {section}{\numberline {1.7}Despliegue a Producción}{11}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Preparación del Servidor}{11}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {1.7.2}Comandos de Despliegue}{12}{subsection.1.7.2}%
+\contentsline {section}{\numberline {1.8}Mantenimiento y Extensiones}{12}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Backup de Base de Datos}{12}{subsection.1.8.1}%
+\contentsline {subsection}{\numberline {1.8.2}Extensiones Futuras}{12}{subsection.1.8.2}%
+\contentsline {section}{\numberline {1.9}Solución de Problemas}{13}{section.1.9}%
+\contentsline {subsection}{\numberline {1.9.1}Problemas Comunes}{13}{subsection.1.9.1}%
+\contentsline {section}{\numberline {1.10}Conclusion}{13}{section.1.10}%
+\contentsline {section}{\numberline {.1}Codigo de Configuracion Completo}{13}{section.Alph0.1}%
+\contentsline {subsection}{\numberline {.1.1}settings.py}{13}{subsection.Alph0.1.1}%
+\contentsline {section}{\numberline {.2}URLs Principal}{14}{section.Alph0.2}%

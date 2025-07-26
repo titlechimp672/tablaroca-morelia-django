@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Eliminar Imagen - {{ imagen.blog.titulo }}{% endblock %}
+
+{% block content %}
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="{% url 'lista_blogs' %}" class="text-decoration-none">
+                <i class="bi bi-house-door me-1"></i>Mis Blogs
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'editar_blog' imagen.blog.id %}" class="text-decoration-none">
+                <i class="bi bi-pencil me-1"></i>{{ imagen.blog.titulo|truncatechars:30 }}
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            <i class="bi bi-trash me-1"></i>Eliminar Imagen
+        </li>
+    </ol>
+</nav>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        
+        <!-- Alerta de advertencia -->
+        <div class="alert alert-warning border-warning" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h6 class="alert-heading mb-1">¡Acción Irreversible!</h6>
+                    <p class="mb-0">La imagen será eliminada permanentemente del servidor. Esta acción no se puede deshacer.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card principal -->
+        <div class="card bg-dark text-light border-warning shadow-sm">
+            <div class="card-header border-bottom border-warning bg-warning bg-opacity-10">
+                <h5 class="mb-0 text-warning">
+                    <i class="bi bi-image me-2"></i>Confirmar Eliminación de Imagen
+                </h5>
+            </div>
+            <div class="card-body">
+                
+                <!-- Información del blog -->
+                <div class="mb-3">
+                    <h6 class="text-light">Blog asociado:</h6>
+                    <div class="bg-secondary bg-opacity-50 rounded p-2 border border-secondary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong class="text-info">{{ imagen.blog.titulo }}</strong>
+                                <div class="small text-muted">
+                                    <i class="bi bi-calendar me-1"></i>{{ imagen.blog.fecha_creacion|date:"d M Y" }}
+                                    <span class="ms-2">
+                                        <i class="bi bi-palette me-1"></i>{{ imagen.blog.seccion|capfirst }}
+                                    </span>
+                                </div>
+                            </div>
+                            <span class="badge {% if imagen.blog.publicar %}bg-success{% else %}bg-secondary{% endif %}">
+                                <i class="bi {% if imagen.blog.publicar %}bi-eye-fill{% else %}bi-eye-slash{% endif %} me-1"></i>
+                                {% if imagen.blog.publicar %}Publicado{% else %}Borrador{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vista previa de la imagen -->
+                <div class="mb-4">
+                    <h6 class="text-light">Imagen a eliminar:</h6>
+                    <div class="text-center bg-secondary bg-opacity-25 rounded p-4 border border-secondary">
+                        <img src="{{ imagen.imagen.url }}" 
+                             alt="Imagen a eliminar" 
+                             class="img-fluid rounded shadow"
+                             style="max-height: 300px; max-width: 100%;">
+                        <div class="mt-3">
+                            <div class="small text-muted">
+                                <i class="bi bi-file-earmark-image me-1"></i>
+                                Archivo: {{ imagen.imagen.name }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información sobre el impacto -->
+                <div class="mb-4">
+                    <h6 class="text-light">Impacto de la eliminación:</h6>
+                    <div class="bg-warning bg-opacity-10 border border-warning rounded p-3">
+                        <ul class="mb-0 small">
+                            <li class="mb-1">
+                                <i class="bi bi-dash text-warning me-2"></i>
+                                La imagen desaparecerá del blog público
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-dash text-warning me-2"></i>
+                                El archivo se eliminará permanentemente del servidor
+                            </li>
+                            <li class="mb-1">
+                                <i class="bi bi-dash text-warning me-2"></i>
+                                Podrás subir una nueva imagen después
+                            </li>
+                            <li class="mb-0">
+                                <i class="bi bi-dash text-warning me-2"></i>
+                                El blog seguirá funcionando sin imagen
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Confirmación -->
+                <div class="mb-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDelete">
+                        <label class="form-check-label" for="confirmDelete">
+                            <strong>Confirmo que quiero eliminar esta imagen</strong>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <form method="post" id="deleteImageForm">
+                    {% csrf_token %}
+                    <div class="d-flex gap-2 justify-content-end">
+                        <a href="{% url 'editar_blog' imagen.blog.id %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i>Cancelar
+                        </a>
+                        <a href="{% url 'vista_publica_cliente' imagen.blog.propietario.username imagen.blog.seccion %}" 
+                           target="_blank" class="btn btn-outline-info">
+                            <i class="bi bi-box-arrow-up-right me-1"></i>Ver en Blog
+                        </a>
+                        <button type="submit" class="btn btn-warning" id="deleteBtn" disabled>
+                            <span id="deleteText">
+                                <i class="bi bi-trash me-1"></i>Eliminar Imagen
+                            </span>
+                            <span id="deleteSpinner" class="d-none">
+                                <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+                                Eliminando...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Alternativas -->
+        <div class="mt-4">
+            <div class="card bg-secondary text-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-lightbulb me-2"></i>Alternativas
+                    </h6>
+                    <p class="card-text small mb-3">
+                        En lugar de eliminar, considera estas opciones:
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        {% if imagen.blog.publicar %}
+                            <a href="{% url 'alternar_publicar' imagen.blog.id %}" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-eye-slash me-1"></i>Despublicar Blog
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'editar_blog' imagen.blog.id %}" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-pencil me-1"></i>Editar Blog
+                        </a>
+                        <a href="{% url 'lista_blogs' %}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-grid me-1"></i>Ver Todos los Blogs
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmCheckbox = document.getElementById('confirmDelete');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const deleteForm = document.getElementById('deleteImageForm');
+    const deleteText = document.getElementById('deleteText');
+    const deleteSpinner = document.getElementById('deleteSpinner');
+
+    // Habilitar/deshabilitar botón según checkbox
+    confirmCheckbox.addEventListener('change', function() {
+        deleteBtn.disabled = !this.checked;
+        
+        if (this.checked) {
+            deleteBtn.classList.remove('btn-secondary');
+            deleteBtn.classList.add('btn-warning');
+        } else {
+            deleteBtn.classList.remove('btn-warning');
+            deleteBtn.classList.add('btn-secondary');
+        }
+    });
+
+    // Confirmación antes de enviar
+    deleteForm.addEventListener('submit', function(e) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta imagen? No podrás recuperarla.')) {
+            e.preventDefault();
+            return false;
+        }
+
+        // Loading state
+        deleteText.classList.add('d-none');
+        deleteSpinner.classList.remove('d-none');
+        deleteBtn.disabled = true;
+    });
+
+    // Zoom en imagen al hacer click
+    const image = document.querySelector('img[alt="Imagen a eliminar"]');
+    if (image) {
+        image.style.cursor = 'pointer';
+        image.addEventListener('click', function() {
+            // Crear modal para zoom
+            const modal = document.createElement('div');
+            modal.className = 'modal fade';
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content bg-dark text-light">
+                        <div class="modal-header border-secondary">
+                            <h5 class="modal-title">Vista Completa</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img src="${this.src}" class="img-fluid" alt="Vista completa">
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+            
+            // Limpiar modal al cerrar
+            modal.addEventListener('hidden.bs.modal', function() {
+                document.body.removeChild(modal);
+            });
+        });
+    }
+
+    // Efecto visual en el checkbox
+    confirmCheckbox.addEventListener('change', function() {
+        const imageContainer = document.querySelector('.text-center.bg-secondary');
+        if (this.checked) {
+            imageContainer.style.borderColor = '#ffc107';
+            imageContainer.style.borderWidth = '2px';
+        } else {
+            imageContainer.style.borderColor = '';
+            imageContainer.style.borderWidth = '';
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,368 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{courier}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+
+% Configuración de márgenes
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+
+% Configuración para el código Python
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,
+	breaklines=true,
+	captionpos=b,
+	keepspaces=true,
+	numbers=left,
+	numbersep=5pt,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	tabsize=2,
+	language=Python
+}
+
+\lstset{style=mystyle}
+
+% Configuración de encabezados y pies de página
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Explicación de models.py}
+\rhead{Django - Sistema de Blogs}
+\cfoot{\thepage}
+
+\title{\textbf{Explicación Detallada del Archivo models.py}\\
+	\large Sistema de Gestión de Blogs en Django}
+\author{Documentación Técnica}
+\date{\today}
+
+\begin{document}
+	
+	\maketitle
+	\thispagestyle{empty}
+	
+	\newpage
+	\tableofcontents
+	\newpage
+	
+	\section{Introducción}
+	
+	El archivo \texttt{models.py} es uno de los componentes fundamentales en cualquier aplicación Django. Define los modelos de datos que representan las tablas en la base de datos. En este documento, analizaremos línea por línea el archivo \texttt{models.py} de la aplicación de blogs, explicando el propósito y funcionamiento de cada elemento.
+	
+	\section{Importaciones}
+	
+	\begin{lstlisting}[language=Python]
+		from django.db import models
+		from django.contrib.auth.models import User
+		import os
+	\end{lstlisting}
+	
+	\subsection{Línea 1: \texttt{from django.db import models}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el módulo \texttt{models} de Django, que contiene todas las clases base necesarias para crear modelos de base de datos.
+		\item \textbf{Funcionalidad}: Proporciona acceso a:
+		\begin{itemize}
+			\item La clase base \texttt{Model} de la que heredan todos los modelos
+			\item Tipos de campos como \texttt{CharField}, \texttt{TextField}, \texttt{DateTimeField}, etc.
+			\item Opciones de relaciones como \texttt{ForeignKey}, \texttt{ManyToManyField}, etc.
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 2: \texttt{from django.contrib.auth.models import User}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el modelo \texttt{User} predefinido de Django.
+		\item \textbf{Funcionalidad}: 
+		\begin{itemize}
+			\item Permite utilizar el sistema de autenticación integrado de Django
+			\item El modelo \texttt{User} incluye campos como username, password, email, first\_name, last\_name, etc.
+			\item Se utiliza para asociar blogs con usuarios específicos del sistema
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 3: \texttt{import os}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Importa el módulo \texttt{os} de Python estándar.
+		\item \textbf{Funcionalidad}: 
+		\begin{itemize}
+			\item Proporciona funciones para interactuar con el sistema operativo
+			\item En este contexto, se usa específicamente \texttt{os.path.join()} para construir rutas de archivos de manera segura y portable
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Función de Renombrado de Imágenes}
+	
+	\begin{lstlisting}[language=Python]
+		def renombrar_imagen(instance, filename):
+		blog_id = instance.blog.id or 'temp'
+		# Contar cuantas imagenes ya existen del blog
+		total = Imagen.objects.filter(blog=instance.blog).count() + 1
+		extension = filename.split('.')[-1]
+		nuevo_nombre = f"blog{blog_id}_{total:03d}.{extension}"
+		return os.path.join('imagenes_blogs', nuevo_nombre)
+	\end{lstlisting}
+	
+	\subsection{Línea 4: \texttt{def renombrar\_imagen(instance, filename):}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Define una función personalizada para renombrar archivos de imagen al subirlos.
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{instance}: La instancia del modelo \texttt{Imagen} que se está guardando
+			\item \texttt{filename}: El nombre original del archivo subido
+		\end{itemize}
+		\item \textbf{Uso}: Esta función se pasa como argumento al parámetro \texttt{upload\_to} del campo \texttt{ImageField}
+	\end{itemize}
+	
+	\subsection{Línea 5: \texttt{blog\_id = instance.blog.id or 'temp'}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Obtiene el ID del blog asociado o asigna 'temp' si no existe.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{instance.blog} accede a la relación ForeignKey hacia el modelo Blog
+			\item \texttt{.id} obtiene el identificador único del blog
+			\item El operador \texttt{or} proporciona un valor por defecto si el blog aún no tiene ID (caso de creación simultánea)
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 7: \texttt{total = Imagen.objects.filter(blog=instance.blog).count() + 1}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Calcula el número secuencial para la nueva imagen.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{Imagen.objects} accede al manager del modelo Imagen
+			\item \texttt{.filter(blog=instance.blog)} filtra solo las imágenes del blog actual
+			\item \texttt{.count()} cuenta cuántas imágenes existen
+			\item Se suma 1 para obtener el número de la nueva imagen
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 8: \texttt{extension = filename.split('.')[-1]}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Extrae la extensión del archivo original.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{split('.')} divide el nombre del archivo por puntos
+			\item \texttt{[-1]} obtiene el último elemento (la extensión)
+			\item Ejemplo: "imagen.jpg" → ["imagen", "jpg"] → "jpg"
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 9: \texttt{nuevo\_nombre = f"blog\{blog\_id\}\_\{total:03d\}.\{extension\}"}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Construye el nuevo nombre del archivo usando f-strings.
+		\item \textbf{Formato resultante}: \texttt{blog[ID]\_[NUMERO].extension}
+		\item \textbf{Detalles}:
+		\begin{itemize}
+			\item \texttt{\{total:03d\}} formatea el número con 3 dígitos, rellenando con ceros
+			\item Ejemplos: blog5\_001.png, blog5\_002.jpg, blog5\_003.gif
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 10: \texttt{return os.path.join('imagenes\_blogs', nuevo\_nombre)}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Retorna la ruta completa donde se guardará el archivo.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item \texttt{os.path.join()} construye rutas de manera segura según el sistema operativo
+			\item La imagen se guardará en: \texttt{MEDIA\_ROOT/imagenes\_blogs/blog[ID]\_[NUMERO].extension}
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Modelo Blog}
+	
+	\begin{lstlisting}[language=Python]
+		class Blog(models.Model):
+		propietario = models.ForeignKey(User, on_delete=models.CASCADE)
+		titulo = models.CharField(max_length=255)
+		descripcion = models.TextField(blank=True)
+		fecha_creacion = models.DateTimeField(auto_now_add=True)
+		publicar = models.BooleanField(default=False)
+		seccion = models.CharField(max_length=100, default='blog1')
+		
+		def __str__(self):
+		return self.titulo
+	\end{lstlisting}
+	
+	\subsection{Línea 11: \texttt{class Blog(models.Model):}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Define la clase Blog que hereda de \texttt{models.Model}.
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item Crea una tabla llamada \texttt{blogs\_blog} en la base de datos
+			\item Hereda métodos como \texttt{save()}, \texttt{delete()}, \texttt{objects}, etc.
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 12: \texttt{propietario = models.ForeignKey(User, on\_delete=models.CASCADE)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Relación muchos-a-uno (ForeignKey)
+		\item \textbf{Propósito}: Asocia cada blog con un usuario propietario
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{User}: El modelo al que se relaciona
+			\item \texttt{on\_delete=models.CASCADE}: Si se elimina el usuario, se eliminan todos sus blogs
+		\end{itemize}
+		\item \textbf{En la base de datos}: Se crea una columna \texttt{propietario\_id} con la clave foránea
+	\end{itemize}
+	
+	\subsection{Línea 13: \texttt{titulo = models.CharField(max\_length=255)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo de caracteres con longitud limitada
+		\item \textbf{Propósito}: Almacena el título del blog
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{max\_length=255}: Límite máximo de 255 caracteres
+		\end{itemize}
+		\item \textbf{En la base de datos}: Se crea como VARCHAR(255)
+	\end{itemize}
+	
+	\subsection{Línea 14: \texttt{descripcion = models.TextField(blank=True)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo de texto largo sin límite específico
+		\item \textbf{Propósito}: Almacena la descripción completa del blog
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{blank=True}: Permite que el campo esté vacío en formularios
+		\end{itemize}
+		\item \textbf{En la base de datos}: Se crea como TEXT
+	\end{itemize}
+	
+	\subsection{Línea 15: \texttt{fecha\_creacion = models.DateTimeField(auto\_now\_add=True)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo de fecha y hora
+		\item \textbf{Propósito}: Registra automáticamente cuándo se creó el blog
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{auto\_now\_add=True}: Se establece automáticamente al crear el objeto
+			\item El valor se mantiene inmutable después de la creación
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 16: \texttt{publicar = models.BooleanField(default=False)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo booleano (True/False)
+		\item \textbf{Propósito}: Controla si el blog está publicado o en borrador
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{default=False}: Los blogs nuevos están en borrador por defecto
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 17: \texttt{seccion = models.CharField(max\_length=100, default='blog1')}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo de caracteres
+		\item \textbf{Propósito}: Categoriza el blog en diferentes secciones
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{max\_length=100}: Límite de 100 caracteres
+			\item \texttt{default='blog1'}: Valor por defecto para nuevos blogs
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Líneas 19-20: Método \texttt{\_\_str\_\_}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Define la representación en string del objeto
+		\item \textbf{Funcionalidad}:
+		\begin{itemize}
+			\item Se usa en el admin de Django y al imprimir objetos
+			\item Retorna el título del blog como representación
+		\end{itemize}
+	\end{itemize}
+	
+	\section{Modelo Imagen}
+	
+	\begin{lstlisting}[language=Python]
+		class Imagen(models.Model):
+		blog = models.ForeignKey(Blog, on_delete=models.CASCADE, 
+		related_name='imagenes')
+		imagen = models.ImageField(upload_to=renombrar_imagen)
+		
+		def __str__(self):
+		return f"Imagen de {self.blog.titulo}"
+	\end{lstlisting}
+	
+	\subsection{Línea 21: \texttt{class Imagen(models.Model):}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Define el modelo para almacenar imágenes asociadas a blogs
+		\item \textbf{Funcionalidad}: Crea la tabla \texttt{blogs\_imagen} en la base de datos
+	\end{itemize}
+	
+	\subsection{Línea 22: \texttt{blog = models.ForeignKey(Blog, on\_delete=models.CASCADE, related\_name='imagenes')}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Relación muchos-a-uno
+		\item \textbf{Propósito}: Asocia cada imagen con un blog específico
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{Blog}: Modelo al que se relaciona
+			\item \texttt{on\_delete=models.CASCADE}: Si se elimina el blog, se eliminan sus imágenes
+			\item \texttt{related\_name='imagenes'}: Permite acceder desde un blog a sus imágenes con \texttt{blog.imagenes.all()}
+		\end{itemize}
+	\end{itemize}
+	
+	\subsection{Línea 23: \texttt{imagen = models.ImageField(upload\_to=renombrar\_imagen)}}
+	\begin{itemize}
+		\item \textbf{Tipo de campo}: Campo para archivos de imagen
+		\item \textbf{Propósito}: Almacena la ruta del archivo de imagen
+		\item \textbf{Parámetros}:
+		\begin{itemize}
+			\item \texttt{upload\_to=renombrar\_imagen}: Usa la función personalizada para determinar dónde y cómo guardar el archivo
+		\end{itemize}
+		\item \textbf{Requisitos}: Necesita la librería Pillow instalada
+	\end{itemize}
+	
+	\subsection{Líneas 25-26: Método \texttt{\_\_str\_\_}}
+	\begin{itemize}
+		\item \textbf{Propósito}: Representación en string del objeto Imagen
+		\item \textbf{Funcionalidad}: Muestra "Imagen de [título del blog]"
+		\item \textbf{Uso de f-string}: Permite interpolación de variables de manera elegante
+	\end{itemize}
+	
+	\section{Resumen de Funcionalidades}
+	
+	\subsection{Características del Sistema}
+	\begin{enumerate}
+		\item \textbf{Gestión de usuarios}: Cada blog tiene un propietario (usuario del sistema)
+		\item \textbf{Control de publicación}: Los blogs pueden estar en borrador o publicados
+		\item \textbf{Organización por secciones}: Los blogs se categorizan en diferentes secciones
+		\item \textbf{Galería de imágenes}: Cada blog puede tener múltiples imágenes asociadas
+		\item \textbf{Nomenclatura automática}: Las imágenes se renombran automáticamente siguiendo un patrón consistente
+	\end{enumerate}
+	
+	\subsection{Ventajas del Diseño}
+	\begin{itemize}
+		\item \textbf{Integridad referencial}: El uso de \texttt{CASCADE} mantiene la consistencia de datos
+		\item \textbf{Organización de archivos}: El sistema de renombrado evita conflictos y mantiene orden
+		\item \textbf{Escalabilidad}: El diseño permite agregar fácilmente más campos o funcionalidades
+		\item \textbf{Integración con Django Admin}: Los métodos \texttt{\_\_str\_\_} facilitan la administración
+	\end{itemize}
+	
+	\section{Conclusión}
+	
+	Este archivo \texttt{models.py} establece una estructura sólida para un sistema de gestión de blogs con las siguientes capacidades:
+	
+	\begin{itemize}
+		\item Autenticación y autorización mediante el modelo User de Django
+		\item Gestión completa del ciclo de vida de un blog (creación, edición, publicación)
+		\item Sistema robusto de gestión de imágenes con nomenclatura automática
+		\item Categorización mediante secciones
+		\item Trazabilidad temporal con fechas de creación automáticas
+	\end{itemize}
+	
+	La arquitectura de modelos presentada es extensible y sigue las mejores prácticas de Django, proporcionando una base sólida para el desarrollo de funcionalidades adicionales.
+	
+\end{document}
+```

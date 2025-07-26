@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Iniciar Sesión - Blog Admin{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+        
+        <!-- Logo/Branding -->
+        <div class="text-center mb-4">
+            <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" 
+                 style="width: 80px; height: 80px;">
+                <i class="bi bi-journal-text text-white" style="font-size: 2rem;"></i>
+            </div>
+            <h3 class="text-white mt-3 mb-1">Blog Admin</h3>
+            <p class="text-muted">Accede a tu panel de administración</p>
+        </div>
+
+        <!-- Card de Login -->
+        <div class="card bg-dark text-light border-secondary shadow-lg">
+            <div class="card-body p-4">
+                
+                <!-- Mensajes de error -->
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    {{ form.non_field_errors.0 }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                </div>
+                {% endif %}
+
+                <!-- Mensajes del sistema -->
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" novalidate id="loginForm">
+                    {% csrf_token %}
+                    
+                    <!-- Campo Usuario -->
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">
+                            <i class="bi bi-person me-1"></i>Usuario
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-secondary border-secondary">
+                                <i class="bi bi-person text-muted"></i>
+                            </span>
+                            {{ form.username|add_class:"form-control border-start-0"|attr:"placeholder:Ingresa tu usuario"|attr:"autocomplete:username" }}
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ form.username.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Campo Contraseña -->
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">
+                            <i class="bi bi-shield-lock me-1"></i>Contraseña
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-secondary border-secondary">
+                                <i class="bi bi-lock text-muted"></i>
+                            </span>
+                            {{ form.password|add_class:"form-control border-start-0"|attr:"placeholder:Ingresa tu contraseña"|attr:"autocomplete:current-password" }}
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>{{ form.password.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recordar sesión -->
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember">
+                            <label class="form-check-label" for="remember">
+                                Recordar mi sesión
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botón de login -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg" id="loginBtn">
+                            <span id="loginText">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión
+                            </span>
+                            <span id="loginSpinner" class="d-none">
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Iniciando...
+                            </span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Links adicionales -->
+                <hr class="my-4 border-secondary">
+                <div class="text-center">
+                    <p class="mb-2">
+                        <a href="#" class="text-muted text-decoration-none">
+                            <i class="bi bi-question-circle me-1"></i>¿Olvidaste tu contraseña?
+                        </a>
+                    </p>
+                    <small class="text-muted">
+                        ¿No tienes cuenta? 
+                        <a href="#" class="text-primary text-decoration-none">Contacta al administrador</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                &copy; {% now "Y" %} Blog Admin. Sistema de gestión de contenido.
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus en el campo de usuario
+    const usernameField = document.getElementById('id_username');
+    if (usernameField) {
+        usernameField.focus();
+    }
+
+    // Toggle para mostrar/ocultar contraseña
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField = document.getElementById('id_password');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (togglePassword && passwordField) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            toggleIcon.classList.toggle('bi-eye');
+            toggleIcon.classList.toggle('bi-eye-slash');
+        });
+    }
+
+    // Loading state en el botón
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const loginText = document.getElementById('loginText');
+    const loginSpinner = document.getElementById('loginSpinner');
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', function() {
+            loginText.classList.add('d-none');
+            loginSpinner.classList.remove('d-none');
+            loginBtn.disabled = true;
+        });
+    }
+
+    // Validación en tiempo real
+    const form = document.getElementById('loginForm');
+    if (form) {
+        form.addEventListener('input', function(e) {
+            const field = e.target;
+            const fieldGroup = field.closest('.mb-3, .mb-4');
+            const errorDiv = fieldGroup.querySelector('.text-danger');
+            
+            if (field.value.trim() !== '') {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+                if (errorDiv) {
+                    errorDiv.style.display = 'none';
+                }
+            }
+        });
+    }
+});
+</script>
+
+<style>
+.min-vh-100 {
+    min-height: 100vh !important;
+}
+
+.input-group-text {
+    border-right: none;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    border-color: #198754;
+}
+
+.card {
+    backdrop-filter: blur(10px);
+}
+
+/* Animation para el loading */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Mejoras visuales para el input group */
+.input-group .form-control:focus {
+    z-index: 3;
+    border-left: 1px solid #198754;
+}
+
+.input-group .btn-outline-secondary:hover {
+    z-index: 3;
+}
+</style>
+{% endblock %}

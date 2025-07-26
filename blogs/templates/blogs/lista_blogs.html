@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Blogs{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="text-white">Mis Blogs</h2>
+    <a href="{% url 'crear_blog' %}" class="btn btn-success btn-sm">
+        <i class="bi bi-plus-circle"></i> Nuevo Blog
+    </a>
+</div>
+
+
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <!-- Filtros a la izquierda -->
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <strong class="text-white">Filtrar por sección:</strong>
+            <a href="{% url 'lista_blogs' %}" class="btn btn-sm {% if not seccion_activa %}btn-primary{% else %}btn-outline-light{% endif %}">
+                Todas
+            </a>
+            {% for seccion in secciones %}
+            <a href="?seccion={{ seccion }}" class="btn btn-sm {% if seccion_activa == seccion %}btn-primary{% else %}btn-outline-light{% endif %}">
+                {{ seccion|capfirst }}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Botones Ver Blog a la derecha -->
+        <div class="d-flex gap-2">
+            <a href="{% url 'vista_publica_cliente' user.username 'blog1' %}" class="btn btn-sm btn-outline-primary" target="_blank" title="Ver Blog 1">
+                <i class="bi bi-box-arrow-up-right"></i> Ver Blog 1
+            </a>
+            <a href="{% url 'vista_publica_cliente' user.username 'blog2' %}" class="btn btn-sm btn-outline-primary" target="_blank" title="Ver Blog 2">
+                <i class="bi bi-box-arrow-up-right"></i> Ver Blog 2
+            </a>
+        </div>
+    </div>
+
+
+
+    {% if blogs %}
+    {% for blog in blogs %}
+    <div class="card bg-dark text-light border-secondary mb-4 shadow-sm">
+        <div class="card-body">
+            <div class="row align-items-center gx-3 gy-2">
+
+
+
+                <!-- ID y Título -->
+                <div class="col-12 col-md-3">
+                    <h5 class="mb-1">#{{ forloop.counter }} - {{ blog.titulo }}</h5>
+                    <p class="mb-0 small text-muted">{{ blog.descripcion|truncatechars:100 }}</p>
+                </div>
+
+                <!-- Imágenes -->
+                <div class="col-12 col-md-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                        <!-- Grupo de imágenes (izquierda) -->
+                        <div class="d-flex flex-wrap gap-2 flex-grow-1">
+                            {% for imagen in blog.imagenes.all %}
+                            <div class="text-center">
+                                <img src="{{ imagen.imagen.url }}" alt="Imagen" width="60" height="60" class="rounded shadow-sm mb-1">
+                                <br>
+                                <a href="{% url 'eliminar_imagen' imagen.id %}" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash3"></i>
+                                </a>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Botón alineado a la derecha -->
+                        <div class="text-end">
+                            {% if blog.imagenes.count < 1 %}
+                            <a href="{% url 'subir_imagen' blog.id %}" class="btn btn-sm btn-outline-info">
+                                <i class="bi bi-upload"></i> Subir
+                            </a>
+                            {% else %}
+                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                <i class="bi bi-upload"></i> Ya tiene imagen
+                            </button>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Acciones -->
+                <div class="col-12 col-md-5 d-flex flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center gap-2 mt-3 mt-md-0">
+
+                    <!-- Grupo de edición -->
+                    <div class="btn-group btn-group-sm" role="group">
+                        <a href="{% url 'editar_blog' blog.id %}" class="btn btn-outline-warning" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'eliminar_blog' blog.id %}" class="btn btn-outline-danger" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
+
+                    <!-- Grupo de publicación por sección -->
+                    <div class="btn-group btn-group-sm" role="group">
+                        {% for seccion in secciones %}
+                        <a href="{% url 'alternar_publicar_por_seccion' blog.id seccion %}" class="btn {% if blog.publicar and blog.seccion == seccion %}btn-success{% else %}btn-outline-secondary{% endif %}" title="Publicar en {{ seccion|capfirst }}">
+                            <i class="bi {% if blog.publicar and blog.seccion == seccion %}bi-eye-fill{% else %}bi-eye-slash{% endif %}"></i> {{ seccion|capfirst }}
+                        </a>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-warning text-center">
+    No tienes blogs todavía.
+</div>
+{% endif %}
+
+{% endblock %}
