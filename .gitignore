@@ -5,3 +5,5 @@ db.sqlite3
 media/uploads/
 .DS_Store
 *.log
+collected_static/
+media/imagenes_blogs/
