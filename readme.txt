@@ -1,7 +1,9 @@
-En windows
+En WSL (carpeta del proyecto)
 
 git add . && git commit -m "Cambios" && git push
 
-En servidor
+Actualizar el servidor
 
-bash /home/update_site.sh
+ssh nuevo 'bash /home/update_site.sh'
+
+Guía completa: guia_proyecto.md
