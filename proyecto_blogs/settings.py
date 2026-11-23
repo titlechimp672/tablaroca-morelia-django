@@ -168,3 +168,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = '/usuarios/login/'           # A dónde redirigir para login
 LOGIN_REDIRECT_URL = '/blogs/'           # Después del login exitoso
 LOGOUT_REDIRECT_URL = '/usuarios/login/' # Después del logout
+
+
+# Seguridad en producción (detrás de NGINX con HTTPS)
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    CSRF_TRUSTED_ORIGINS = ['https://' + h for h in ALLOWED_HOSTS if h]
+    # HSTS: empezar bajo; subir a 31536000 (1 año) cuando todo esté probado
+    SECURE_HSTS_SECONDS = config('SECURE_HSTS_SECONDS', default=3600, cast=int)
